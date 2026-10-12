@@ -125,7 +125,7 @@ Replace the remote URL with your own repository URL. Do not commit `.env`, passw
 
 1. Push the project to GitHub, then in Render choose **New + → Blueprint** and connect that repository. Render reads `render.yaml`.
 2. The build command is `pip install -r requirements.txt && python manage.py collectstatic --no-input`.
-3. The start command runs `python manage.py migrate --noinput && python manage.py seed_menu --if-empty` before Gunicorn. This initializes a fresh Render runtime database and inserts the sample menu only if it is empty; it does not overwrite an existing menu.
+3. The start command runs `python manage.py migrate --noinput && python manage.py ensure_menu` before Gunicorn. This initializes a fresh Render runtime database and inserts the sample menu only if it is empty; it does not overwrite an existing menu.
 4. `render.yaml` generates `SECRET_KEY`, sets `DEBUG=false`, and sets the CSRF trusted origin pattern. Django also allows Render's `RENDER_EXTERNAL_HOSTNAME` automatically. Do not set a committed secret in the repository.
 5. After deployment, create a staff login from the Render shell with `python manage.py createsuperuser`, then manage menu records in `/admin/`.
 

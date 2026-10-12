@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
-    startCommand: python manage.py migrate --noinput && python manage.py shell -c "from restaurant.models import MenuItem; from django.core.management import call_command; call_command('seed_menu') if not MenuItem.objects.exists() else print('Menu already has items; skipping seed.')" && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: python manage.py migrate --noinput && python manage.py ensure_menu && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8

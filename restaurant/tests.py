@@ -211,6 +211,23 @@ class OrderingFlowTests(TestCase):
         self.assertEqual(self.item.price, Decimal("12.50"))
         self.assertEqual(self.item.name, "Garden Bowl")
 
+    def test_ensure_menu_preserves_existing_menu_data(self):
+        call_command("ensure_menu", stdout=StringIO())
+        self.assertEqual(MenuItem.objects.count(), 1)
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.price, Decimal("12.50"))
+
+    def test_ensure_menu_seeds_empty_database(self):
+        MenuItem.objects.all().delete()
+
+        call_command("ensure_menu", stdout=StringIO())
+
+        self.assertEqual(MenuItem.objects.count(), 47)
+        self.assertEqual(
+            MenuItem.objects.get(name="Vegetable Samosa").image_path,
+            "images/menu/vegetable-samosa.webp",
+        )
+
     def test_checkout_uses_database_price_and_persists_order(self):
         response = self.client.post(
             reverse("restaurant:checkout"),
