@@ -124,12 +124,14 @@ Replace the remote URL with your own repository URL. Do not commit `.env`, passw
 ## Deploy on Render
 
 1. Push the project to GitHub, then in Render choose **New + → Blueprint** and connect that repository. Render reads `render.yaml`.
-2. The build command is `pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate`.
-3. The start command is `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`.
+2. The build command is `pip install -r requirements.txt && python manage.py collectstatic --no-input`.
+3. The start command runs `python manage.py migrate --noinput && python manage.py seed_menu --if-empty` before Gunicorn. This initializes a fresh Render runtime database and inserts the sample menu only if it is empty; it does not overwrite an existing menu.
 4. `render.yaml` generates `SECRET_KEY`, sets `DEBUG=false`, and sets the CSRF trusted origin pattern. Django also allows Render's `RENDER_EXTERNAL_HOSTNAME` automatically. Do not set a committed secret in the repository.
-5. After deployment, create a staff login from the Render shell with `python manage.py createsuperuser`, then add menu records in `/admin/` (or run `python manage.py seed_menu` from the shell).
+5. After deployment, create a staff login from the Render shell with `python manage.py createsuperuser`, then manage menu records in `/admin/`.
 
-This assignment intentionally uses SQLite. Render's free service filesystem is ephemeral: the `db.sqlite3` contents, including orders and staff accounts, can disappear after a restart, redeploy, or instance replacement. This is suitable for a class demo, not durable production orders. A persistent disk can change filesystem durability where the plan supports it, but production multi-instance applications should use a managed database; that would no longer meet the SQLite-only assignment requirement.
+Local SQLite data does not get uploaded to GitHub and is not copied into Render. Render starts with its own `db.sqlite3`, so local admin edits and orders do not automatically appear there. The startup command migrates and seeds the sample menu for an empty database; add any custom menu records and create staff users through the deployed admin.
+
+This assignment intentionally uses SQLite. Render's free service filesystem is ephemeral: `db.sqlite3`, including orders and staff accounts, can be lost after a restart, redeploy, or instance replacement. The startup seed repopulates the example menu when the database is empty, but it cannot restore custom rows or orders. This is suitable for a class demo, not durable production orders. A persistent disk can change filesystem durability where the plan supports it, but production multi-instance applications should use a managed database; that would no longer meet the SQLite-only assignment requirement.
 
 ## How the Order Flow Works
 

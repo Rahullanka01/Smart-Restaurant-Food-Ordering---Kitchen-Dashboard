@@ -185,6 +185,10 @@ class OrderingFlowTests(TestCase):
             MenuItem.objects.get(name="Mutton Biryani").price,
             Decimal("320.00"),
         )
+        self.assertEqual(
+            MenuItem.objects.get(name="Vegetable Samosa").image_path,
+            "images/menu/vegetable-samosa.webp",
+        )
         self.assertTrue(MenuItem.objects.get(name="Chicken Momos").image_source_url)
         self.assertTrue(MenuItem.objects.get(name="Pani Puri").image_source_url)
         self.assertContains(self.client.get(reverse("restaurant:home")), "Image source")
@@ -199,6 +203,13 @@ class OrderingFlowTests(TestCase):
         self.assertEqual(samosa.image_path, "images/menu/vegetable-samosa.jpg")
         self.assertEqual(samosa.image_url, "https://api.openverse.org/v1/images/samosa/thumb/")
         self.assertEqual(samosa.image_source_url, "https://www.flickr.com/photos/creator/samosa")
+
+    def test_seed_menu_if_empty_preserves_existing_menu_data(self):
+        call_command("seed_menu", if_empty=True, stdout=StringIO())
+        self.assertEqual(MenuItem.objects.count(), 1)
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.price, Decimal("12.50"))
+        self.assertEqual(self.item.name, "Garden Bowl")
 
     def test_checkout_uses_database_price_and_persists_order(self):
         response = self.client.post(

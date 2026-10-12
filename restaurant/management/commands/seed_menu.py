@@ -1,6 +1,9 @@
+from pathlib import Path
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.utils.text import slugify
 
 from restaurant.models import Category, MenuItem
 
@@ -148,7 +151,18 @@ VERIFIED_IMAGE_SOURCES = {
 class Command(BaseCommand):
     help = "Create or update the Tastique and Indian restaurant menus."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--if-empty",
+            action="store_true",
+            help="Leave an existing menu untouched; seed only when no menu items exist.",
+        )
+
     def handle(self, *args, **options):
+        if options["if_empty"] and MenuItem.objects.exists():
+            self.stdout.write("Menu already has items; existing data was left unchanged.")
+            return
+
         samples = [
             ("Starters", 1, [
                 ("Vegetable Samosa", "Crisp pastry filled with spiced potatoes and peas.", "60.00", True, "photo-1601050690597-df0568f70950"),
@@ -230,6 +244,14 @@ class Command(BaseCommand):
                 if existing_item and existing_item.image_path:
                     image_url = existing_item.image_url
                     image_source_url = existing_item.image_source_url
+                local_image_path = existing_item.image_path if existing_item else ""
+                if not local_image_path:
+                    image_slug = slugify(name)
+                    image_directory = Path(settings.BASE_DIR) / "static" / "images" / "menu"
+                    for extension in (".avif", ".webp", ".jpg", ".jpeg", ".png"):
+                        if (image_directory / f"{image_slug}{extension}").is_file():
+                            local_image_path = f"images/menu/{image_slug}{extension}"
+                            break
                 MenuItem.objects.update_or_create(
                     name=name,
                     defaults={
@@ -239,6 +261,7 @@ class Command(BaseCommand):
                         "is_vegetarian": vegetarian,
                         "is_available": True,
                         "image_url": image_url,
+                        "image_path": local_image_path,
                         "image_source_url": image_source_url,
                     },
                 )
