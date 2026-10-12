@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load currency static %}
+{% block title %}{{ brand_name }} | {{ brand_tagline }}{% endblock %}
+{% block content %}
+<section class="hero-stage">
+  <img class="hero-image" src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=2200&q=88" alt="A table set with a colorful seasonal meal" fetchpriority="high">
+  <div class="hero-shade"></div>
+  <div class="container hero-content"><p class="eyebrow light-eyebrow"><span></span> MODERN INDIAN DINING</p><h1>Taste the<br><em>Extraordinary.</em></h1><p class="hero-copy">Regional Indian favorites, time-honored spices, and food made fresh for sharing.</p><a class="button button-light" href="#menu">Explore the menu <i class="bi bi-arrow-down-right"></i></a></div>
+  <div class="hero-note"><span>{{ brand_name }}</span><span>Modern Indian kitchen</span></div>
+</section>
+
+<section class="menu-section" id="menu">
+  <div class="container">
+    <div class="section-heading"><div><p class="eyebrow"><span></span> {{ brand_name|upper }} MENU</p><h2>A good place<br><em>to start.</em></h2></div><p class="section-intro">Bright ingredients, generous portions, and something for every kind of appetite.</p></div>
+    <div class="menu-toolbar"><div class="category-tabs" role="group" aria-label="Filter menu by category"><a class="category-tab {% if not selected_category %}active{% endif %}" href="{% url 'restaurant:home' %}#menu">All plates</a>{% for category in categories %}<a class="category-tab {% if selected_category == category.slug %}active{% endif %}" href="?category={{ category.slug }}#menu">{{ category.name }}</a>{% endfor %}</div><label class="menu-search"><i class="bi bi-search" aria-hidden="true"></i><span class="visually-hidden">Search menu</span><input id="menu-search" type="search" placeholder="Search dishes" autocomplete="off"></label></div>
+    <p id="menu-no-results" class="menu-no-results" aria-live="polite" hidden>No dishes match your search.</p>
+    <div class="row g-4 menu-grid">
+      {% for item in items %}
+      <article class="col-sm-6 col-lg-4 menu-column" data-menu-item data-search-text="{{ item.name }} {{ item.description }} {{ item.category.name }}">
+        <div class="menu-card">
+          <div class="menu-photo-wrap">
+            <img class="menu-photo" src="{% if item.image_path %}{% static item.image_path %}{% elif item.image_url %}{{ item.image_url }}{% else %}{% static 'images/dish-placeholder.svg' %}{% endif %}" data-fallback-image="{% static 'images/dish-placeholder.svg' %}" alt="{{ item.name }}" loading="lazy">
+            <span class="menu-category">{{ item.category.name }}</span>
+            <span class="availability-badge {% if not item.is_available %}is-unavailable{% endif %}">{% if item.is_available %}Available{% else %}Unavailable{% endif %}</span>
+            {% if item.is_vegetarian %}<span class="veg-badge"><i class="bi bi-leaf"></i> Vegetarian</span>{% else %}<span class="non-veg-badge"><i class="bi bi-fire"></i> Non-vegetarian</span>{% endif %}
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-name-row"><h3>{{ item.name }}</h3><span class="menu-price">{{ item.price|inr }}</span></div>
+            <p>{{ item.description }}</p>
+            <div class="image-source-slot">{% if item.image_source_url %}<a class="image-source" href="{{ item.image_source_url }}" target="_blank" rel="noopener noreferrer">Image source <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>{% endif %}</div>
+            {% if item.is_available %}<button class="add-button" type="button" data-add-to-cart data-item-id="{{ item.pk }}" aria-label="Add {{ item.name }} to cart"><i class="bi bi-plus-lg"></i><span>Add to order</span></button>{% else %}<button class="add-button unavailable-add" type="button" disabled><i class="bi bi-x-circle"></i><span>Unavailable</span></button>{% endif %}
+          </div>
+        </div>
+      </article>
+      {% empty %}<div class="col-12"><p class="empty-menu">Nothing on this menu right now. Please check back soon.</p></div>{% endfor %}
+    </div>
+  </div>
+</section>
+<section class="callout-band"><div class="container callout-inner"><div><p class="eyebrow light-eyebrow"><span></span> YOUR TABLE, YOUR PACE</p><h2>Order now.<br><em>We'll take it from here.</em></h2></div><a class="button button-light" href="{% url 'restaurant:track_order' %}">Track your order <i class="bi bi-arrow-up-right"></i></a></div></section>
+{{ menu_items_json|json_script:"menu-items-data" }}
+{% endblock %}

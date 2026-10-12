@@ -1,0 +1,66 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf5e9">
+  <meta name="dish-fallback-image" content="{% static 'images/dish-placeholder.svg' %}">
+  <script>
+    (() => {
+      let savedTheme = null;
+      try {
+        savedTheme = localStorage.getItem("saffron-table-theme");
+      } catch (error) {
+        savedTheme = null;
+      }
+      const theme = savedTheme === "light" || savedTheme === "dark"
+        ? savedTheme
+        : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+    })();
+  </script>
+  <meta name="application-name" content="{{ brand_name }}">
+  <meta name="description" content="{{ brand_tagline }} Modern Indian cuisine, prepared fresh at {{ brand_name }}.">
+  <title>{% block title %}{{ brand_name }} | {{ brand_tagline }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg site-nav">
+    <div class="container nav-inner">
+      <a class="navbar-brand brand-mark" href="{% url 'restaurant:home' %}" aria-label="{{ brand_name }} home"><span class="brand-symbol">T</span><span class="brand-copy"><span class="brand-name">{{ brand_name }}</span><span class="brand-tagline">{{ brand_tagline }}</span></span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavigation" aria-controls="siteNavigation" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="siteNavigation">
+        <div class="navbar-nav ms-auto align-items-lg-center gap-lg-4">
+          <a class="nav-link" href="{% url 'restaurant:home' %}#menu">Menu</a>
+          <a class="nav-link" href="{% url 'restaurant:track_order' %}">Track order</a>
+          <a class="nav-link" href="{% url 'restaurant:kitchen' %}">Kitchen</a>
+          <a class="nav-cart" href="{% url 'restaurant:cart' %}" aria-label="Shopping cart"><i class="bi bi-bag"></i><span class="cart-count" data-cart-count>0</span></a>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+            <i class="bi bi-sun-fill" data-theme-icon-light aria-hidden="true"></i>
+            <i class="bi bi-moon-stars-fill" data-theme-icon-dark aria-hidden="true"></i>
+            <span data-theme-label-light>Light theme</span>
+            <span data-theme-label-dark>Dark theme</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% if messages %}<div class="container message-stack" aria-live="polite">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>{% endfor %}</div>{% endif %}
+  <main>{% block content %}{% endblock %}</main>
+  <footer class="site-footer">
+    <div class="container footer-inner"><a class="brand-mark footer-brand" href="{% url 'restaurant:home' %}" aria-label="{{ brand_name }} home"><span class="brand-symbol">T</span><span class="brand-copy"><span class="brand-name">{{ brand_name }}</span><span class="brand-tagline">{{ brand_tagline }}</span></span></a><p>{{ brand_tagline }}</p><span class="footer-hours">Modern Indian cuisine · Open daily, 11 am – 10 pm</span></div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="{% static 'js/cart.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

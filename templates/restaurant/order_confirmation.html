@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Order received | {{ brand_name }}{% endblock %}
+{% block content %}
+<section class="page-shell confirmation-shell"><div class="container confirmation-container"><div data-order-complete hidden></div><div class="confirmation-icon"><i class="bi bi-check2"></i></div><p class="eyebrow"><span></span> SENT TO THE KITCHEN</p><h1>Lovely choice<span>.</span></h1><p class="confirmation-copy">Thanks, {{ order.customer_name }}. Your order is with {{ brand_name }}'s kitchen now.</p><div class="order-reference"><span>YOUR ORDER ID</span><strong>{{ order.public_id }}</strong><button type="button" class="copy-button" data-copy-order="{{ order.public_id }}" title="Copy order ID" aria-label="Copy order ID"><i class="bi bi-copy"></i></button></div>
+  <div class="confirmation-details"><div><span>Table</span><strong>{{ order.table_number }}</strong></div><div><span>Items</span><strong>{{ order.items.count }}</strong></div><div><span>Total (INR)</span><strong>{{ order.total|inr }}</strong></div></div>
+  <div class="confirmation-actions"><a class="button button-dark" href="{% url 'restaurant:track_order' %}?order_id={{ order.public_id }}">Track your order <i class="bi bi-arrow-right"></i></a><a class="text-link" href="{% url 'restaurant:home' %}#menu">Back to menu</a></div>
+</div></section>
+{% endblock %}

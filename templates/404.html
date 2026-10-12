@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Page not found | {{ brand_name }}{% endblock %}
+{% block content %}<section class="page-shell error-shell"><div class="container error-content"><span class="error-code">404</span><p class="eyebrow"><span></span> WRONG TURN</p><h1>This page isn't<br><em>on our menu.</em></h1><p>The page you were looking for may have moved, or never existed.</p><a class="button button-dark" href="{% url 'restaurant:home' %}">Return to the menu <i class="bi bi-arrow-right"></i></a></div></section>{% endblock %}

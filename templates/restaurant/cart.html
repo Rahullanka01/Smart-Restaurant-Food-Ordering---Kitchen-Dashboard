@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Your Order | {{ brand_name }}{% endblock %}
+{% block content %}
+<section class="page-shell"><div class="container narrow-container">
+  <a class="back-link" href="{% url 'restaurant:home' %}#menu"><i class="bi bi-arrow-left"></i> Back to menu</a>
+  <div class="page-heading"><p class="eyebrow"><span></span> YOUR SELECTION</p><h1>Your order<span>.</span></h1></div>
+  <div class="cart-layout"><div id="cart-items" class="cart-lines" aria-live="polite"></div><div id="cart-empty" class="empty-state" hidden><i class="bi bi-basket"></i><h2>Your basket is waiting.</h2><p>Add something delicious from the menu.</p><a class="button button-dark" href="{% url 'restaurant:home' %}#menu">Browse menu <i class="bi bi-arrow-right"></i></a></div>
+    <aside id="cart-summary" class="summary-panel"><div class="summary-title"><h2>Summary</h2><span>INR</span></div><div class="summary-row"><span>Subtotal</span><strong id="cart-subtotal">₹0.00</strong></div><div class="summary-row"><span>Estimated tax <small>(8%)</small></span><strong id="cart-tax">₹0.00</strong></div><div class="summary-row summary-total"><span>Total</span><strong id="cart-total">₹0.00</strong></div><a class="button button-dark button-wide" href="{% url 'restaurant:checkout' %}">Continue to checkout <i class="bi bi-arrow-right"></i></a><p class="summary-footnote"><i class="bi bi-shield-check"></i> Final total confirmed at checkout.</p></aside>
+  </div>
+</div></section>
+{{ menu_items_json|json_script:"menu-items-data" }}
+{% endblock %}

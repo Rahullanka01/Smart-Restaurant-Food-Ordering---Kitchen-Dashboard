@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load currency %}
+{% block title %}Kitchen board | {{ brand_name }}{% endblock %}
+{% block content %}
+<section class="page-shell kitchen-shell"><div class="container kitchen-container">
+  <div class="kitchen-heading"><div><p class="eyebrow"><span></span> STAFF WORKSPACE</p><h1>Kitchen board<span>.</span></h1><p>Live queue · {{ orders|length }} active order{{ orders|length|pluralize }}</p></div><a class="text-link" href="{% url 'admin:index' %}"><i class="bi bi-gear"></i> Admin</a></div>
+  {% if orders %}<div class="kitchen-grid">{% for order in orders %}<article class="kitchen-order"><div class="kitchen-order-head"><div><span class="order-short-id">#{{ order.public_id|slice:":8" }}</span><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></div><time>{{ order.created_at|date:"g:i A" }}</time></div><div class="kitchen-customer"><strong>{{ order.customer_name }}</strong><span>Table {{ order.table_number }} · {{ order.phone }}</span></div><div class="kitchen-lines">{% for line in order.items.all %}<div><span><b>{{ line.quantity }}×</b> {{ line.item_name }}</span><strong>{{ line.line_total|inr }}</strong></div>{% endfor %}</div><div class="kitchen-order-foot"><div><span>Total (INR)</span><strong>{{ order.total|inr }}</strong></div><form action="{% url 'restaurant:update_order_status' order.pk %}" method="post">{% csrf_token %}<label class="visually-hidden" for="status-{{ order.pk }}">Change status</label><select id="status-{{ order.pk }}" name="status" aria-label="Update status for order {{ order.public_id|slice:":8" }}">{% for value,label in status_choices %}<option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="icon-button" type="submit" title="Save status" aria-label="Save status"><i class="bi bi-check2"></i></button></form></div></article>{% endfor %}</div>
+  {% else %}<div class="kitchen-empty"><i class="bi bi-check2-circle"></i><h2>All caught up.</h2><p>New orders will appear here as they come in.</p></div>{% endif %}
+</div></section>
+{% endblock %}

@@ -1,0 +1,1 @@
+"""Custom template filters for the restaurant app."""
